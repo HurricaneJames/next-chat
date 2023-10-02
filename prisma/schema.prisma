@@ -11,15 +11,6 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    @@index([name])
-}
-
 // Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
@@ -65,4 +56,14 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Post {
+    id          String      @id @default(cuid())
+    createdAt   DateTime    @default(now())
+
+    content     String      @db.Text()      // this gives us around 32k multibyte characters
+    authorId    String
+
+    @@index([authorId])
 }
