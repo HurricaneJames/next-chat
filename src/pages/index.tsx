@@ -7,7 +7,10 @@ import { api } from "~/utils/api";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { LoadingSpinner } from "~/components/loading";
+import { useState } from "react";
 dayjs.extend(relativeTime);
+
+const LOGO = '→';
 
 export default function Home() {
   return (
@@ -20,7 +23,7 @@ export default function Home() {
       <main className=" flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Next <span className="text-fuchsia-500">Chat</span> →
+            Next <span className="text-fuchsia-500">Chat</span> {LOGO}
           </h1>
           <CreatePost />
           <Posts />
@@ -38,12 +41,31 @@ function CreatePost() {
   const user = sessionData?.user;
   if (!user) return null;
 
-  console.log('User', user);
+  const ctx = api.useContext();
+  const { mutate, isLoading: isMutating } = api.post.create.useMutation({
+    onSuccess: () => {
+      setInput("");
+      void ctx.post.invalidate();
+    }
+  });
+  const [input, setInput] = useState("");
+
 
   return (
     <div className="flex gap-4">
       <img src={user.image || ""} alt="Profile image" className="w-16 h-16 rounded-full" />
-      <input placeholder="What's on your mind?" className="bg-transparent " />
+      <input
+        placeholder="What's on your mind?"
+        className="bg-transparent"
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        disabled={isMutating}
+      />
+      <button onClick={() => {
+        if (!isMutating) {
+          mutate({ content: input });
+        }
+      }}>{LOGO}</button>
     </div>
   )
 }
@@ -63,7 +85,7 @@ function Posts() {
           <img src={post.author.image || ""} alt="Profile image" className="w-12 h-12 rounded-full" />
           <div className="flex flex-col">
             <div className="flex flex-row gap-2">
-              <span className="text-fuchsia-500">{`→${post.author.name}`}</span>
+              <span className="text-fuchsia-500">{`${LOGO}${post.author.name}`}</span>
               <span>{`·`}</span>
               <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
             </div>
