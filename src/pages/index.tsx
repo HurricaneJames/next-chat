@@ -6,6 +6,7 @@ import { api } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { LoadingSpinner } from "~/components/loading";
 dayjs.extend(relativeTime);
 
 export default function Home() {
@@ -48,7 +49,10 @@ function CreatePost() {
 }
 
 function Posts() {
-  const { data: posts } = api.post.getAll.useQuery();
+  const { data: posts, isLoading } = api.post.getAll.useQuery();
+
+  if (isLoading) return <LoadingSpinner />;
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:gap-8">
       {posts?.map((post) => (
@@ -59,7 +63,7 @@ function Posts() {
           <img src={post.author.image || ""} alt="Profile image" className="w-12 h-12 rounded-full" />
           <div className="flex flex-col">
             <div className="flex flex-row gap-2">
-              <span className="text-fuchsia-500">{`@${post.author.name}`}</span>
+              <span className="text-fuchsia-500">{`→${post.author.name}`}</span>
               <span>{`·`}</span>
               <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
             </div>
