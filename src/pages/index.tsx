@@ -102,7 +102,7 @@ function Posts() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:gap-8">
-      {posts?.map(post => <PostView post={post} />)}
+      {posts?.map(post => <PostView key={post.id} post={post} />)}
     </div>
   );
 }
@@ -121,10 +121,7 @@ function PostView({post}: {post: Post}) {
 
 
   return (
-    <div
-      key={post.id}
-      className="flex flex-row max-w-md gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-    >
+    <div className="flex flex-row max-w-md gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
       <img src={post.author.image ?? ""} alt="Profile image" className="w-12 h-12 rounded-full" />
       <div className="flex flex-col">
         <div className="flex flex-row gap-2">
