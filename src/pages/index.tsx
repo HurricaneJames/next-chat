@@ -2,13 +2,14 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 // import Link from "next/link";
 
-import { api } from "~/utils/api";
+import { RouterOutputs, api } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { LoadingSpinner } from "~/components/loading";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { TrashButton } from "~/components/trashButton";
 dayjs.extend(relativeTime);
 
 const LOGO = '→';
@@ -87,8 +88,8 @@ function CreatePost() {
         onClick={() => {
           mutate({ content: input });
         }}>
-          {LOGO}
-        </button>
+        {LOGO}
+      </button>
       }
     </div>
   )
@@ -101,22 +102,44 @@ function Posts() {
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:gap-8">
-      {posts?.map((post) => (
-        <div
-          key={post.id}
-          className="flex max-w-md gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-        >
-          <img src={post.author.image ?? ""} alt="Profile image" className="w-12 h-12 rounded-full" />
-          <div className="flex flex-col">
-            <div className="flex flex-row gap-2">
-              <span className="text-fuchsia-500">{`${LOGO}${post.author.name}`}</span>
-              <span>{`·`}</span>
-              <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
-            </div>
-            <span>{post.content}</span>
-          </div>
+      {posts?.map(post => <PostView post={post} />)}
+    </div>
+  );
+}
+type Post = RouterOutputs["post"]["getAll"][number]
+function PostView({post}: {post: Post}) {
+  const ctx = api.useContext();
+  const { data: sessionData } = useSession();
+  const { mutate, isLoading: isMutating } = api.post.delete.useMutation({
+    onSuccess: () => {
+      void ctx.post.invalidate();
+    },
+    onError: (error) => {
+      return toast.error("Something went wrong. Please try again later");
+    }
+  });
+
+
+  return (
+    <div
+      key={post.id}
+      className="flex flex-row max-w-md gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+    >
+      <img src={post.author.image ?? ""} alt="Profile image" className="w-12 h-12 rounded-full" />
+      <div className="flex flex-col">
+        <div className="flex flex-row gap-2">
+          <span className="text-fuchsia-500">{`${LOGO}${post.author.name}`}</span>
+          <span>{`·`}</span>
+          <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
         </div>
-      ))}
+        <span>{post.content}</span>
+      </div>
+      { !!sessionData?.user && (
+        <div className="ml-auto"><TrashButton onClick={() => {
+          if (isMutating) return;
+          mutate({id: post.id});
+        }}/></div>
+      )}
     </div>
   );
 }
