@@ -48,6 +48,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    posts         Post[]
 }
 
 model VerificationToken {
@@ -64,6 +65,7 @@ model Post {
 
     content     String      @db.Text()      // this gives us around 32k multibyte characters
     authorId    String
+    author      User        @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
     @@index([authorId])
 }
