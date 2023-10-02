@@ -47,7 +47,7 @@ function CreatePost() {
     onError: (error) => {
       const contentError = error.data?.zodError?.fieldErrors.content;
       if (contentError && contentError.length > 0) {
-        return toast.error(contentError[0] || "");
+        return toast.error(contentError[0] ?? "");
       }
       if (error.message == "TOO_MANY_REQUESTS") {
         return toast.error("Too many posts. Please wait a while and try again.");
@@ -64,7 +64,7 @@ function CreatePost() {
 
   return (
     <div className="flex gap-4 flex-row">
-      <img src={user.image || ""} alt="Profile image" className="w-16 h-16 rounded-full" />
+      <img src={user.image ?? ""} alt="Profile image" className="w-16 h-16 rounded-full" />
       <input
         placeholder="What's on your mind?"
         className="bg-transparent"
@@ -106,7 +106,7 @@ function Posts() {
           key={post.id}
           className="flex max-w-md gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
         >
-          <img src={post.author.image || ""} alt="Profile image" className="w-12 h-12 rounded-full" />
+          <img src={post.author.image ?? ""} alt="Profile image" className="w-12 h-12 rounded-full" />
           <div className="flex flex-col">
             <div className="flex flex-row gap-2">
               <span className="text-fuchsia-500">{`${LOGO}${post.author.name}`}</span>
