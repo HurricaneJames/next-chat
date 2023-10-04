@@ -140,7 +140,7 @@ function PostView({ post }: { post: Post }) {
         </div>
         <span>{post.content}</span>
       </div>
-      {!!sessionData?.user && (
+      {sessionData?.user && sessionData.user.id === post.authorId && (
         <div className="ml-auto">
           <TrashButton
             onClick={() => {

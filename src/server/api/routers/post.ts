@@ -59,8 +59,9 @@ export const postRouter = createTRPCRouter({
             id: z.string(),
         }),
     ).mutation(async ({ ctx, input }) => {
+        const authorId = ctx.session.user.id
         await ctx.db.post.delete({
-            where: { id: input.id },
+            where: { id: input.id, authorId },
         });
     }),
 });
