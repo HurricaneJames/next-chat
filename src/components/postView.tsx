@@ -6,6 +6,7 @@ import { RouterOutputs, api } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import Link from "next/link";
 dayjs.extend(relativeTime);
 
 type Post = RouterOutputs["post"]["getAll"][number];
@@ -22,6 +23,8 @@ export default function PostView({ post }: { post: Post }) {
     },
   });
 
+  const authorSlug = post.author.alias ?? post.authorId;
+
   return (
     <div className="flex max-w-md flex-row gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
       <img
@@ -31,7 +34,10 @@ export default function PostView({ post }: { post: Post }) {
       />
       <div className="flex flex-col">
         <div className="flex flex-row gap-2">
-          <span className="text-fuchsia-500">{`${LOGO}${post.author.name}`}</span>
+          <Link
+            className="text-fuchsia-500"
+            href={`/u/${authorSlug}`}
+          >{`${LOGO}${post.author.name}`}</Link>
           <span>{`·`}</span>
           <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
         </div>

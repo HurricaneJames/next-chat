@@ -27,6 +27,7 @@ export const postRouter = createTRPCRouter({
             include: {
                 author: {
                     select: {
+                        alias: true,
                         name: true,
                         image: true,
                     }
