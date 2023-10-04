@@ -14,11 +14,15 @@ export const profileRouter = createTRPCRouter({
     .query(({ ctx, input }) => {
       return ctx.db.user.findUnique({
         select: {
+          id: true,
+          alias: true,
           name: true,
           image: true,
           posts: {
             take: 15,
             select: {
+              id: true,
+              authorId: true,
               content: true,
               createdAt: true,
               // TODO - add a cursor to make it possible to load AFTER

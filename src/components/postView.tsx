@@ -2,16 +2,28 @@ import { useSession } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import { TrashButton } from "~/components/trashButton";
 import { LOGO } from "~/resources/logo";
-import { RouterOutputs, api } from "~/utils/api";
+import { api } from "~/utils/api";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 dayjs.extend(relativeTime);
 
-type Post = RouterOutputs["post"]["getAll"][number];
+type PostViewProps = {
+  post: {
+    id: string;
+    authorId: string;
+    content: string;
+    createdAt: Date;
+  };
+  author: {
+    alias: string | null;
+    image: string | null;
+    name: string | null;
+  };
+};
 
-export default function PostView({ post }: { post: Post }) {
+export default function PostView({ post, author }: PostViewProps) {
   const ctx = api.useContext();
   const { data: sessionData } = useSession();
   const { mutate, isLoading: isMutating } = api.post.delete.useMutation({
@@ -23,12 +35,12 @@ export default function PostView({ post }: { post: Post }) {
     },
   });
 
-  const authorSlug = post.author.alias ?? post.authorId;
+  const authorSlug = author.alias ?? post.authorId;
 
   return (
     <div className="flex max-w-md flex-row gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
       <img
-        src={post.author.image ?? ""}
+        src={author.image ?? ""}
         alt="Profile image"
         className="h-12 w-12 rounded-full"
       />
@@ -37,7 +49,7 @@ export default function PostView({ post }: { post: Post }) {
           <Link
             className="text-fuchsia-500"
             href={`/u/${authorSlug}`}
-          >{`${LOGO}${post.author.name}`}</Link>
+          >{`${LOGO}${author.name}`}</Link>
           <span>{`·`}</span>
           <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
         </div>
