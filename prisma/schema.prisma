@@ -70,5 +70,5 @@ model Post {
     authorId String
     author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-    @@index([authorId])
+    @@index([authorId, createdAt(sort: Desc)])
 }

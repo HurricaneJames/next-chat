@@ -1,29 +1,37 @@
-import { api } from "~/utils/api";
-
-import Layout from "~/components/layout";
-import { LoadingSpinner } from "~/components/loading";
+import { GetStaticProps } from "next";
+import SuperJSON from "superjson";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import CreatePost from "~/components/createPost";
-import PostView from "~/components/postView";
+import Layout from "~/components/layout";
+import PostFeed from "~/components/PostFeed";
+import { appRouter } from "~/server/api/root";
+import { db } from "~/server/db";
+
+const POST_BATCH_SIZE = 10;
 
 export default function Home() {
   return (
     <Layout>
       <CreatePost />
-      <Posts />
+      <PostFeed batchSize={POST_BATCH_SIZE} />
     </Layout>
   );
 }
 
-function Posts() {
-  const { data: posts, isLoading } = api.post.getAll.useQuery();
+export const getStaticProps: GetStaticProps = async (context) => {
+  const serverSideHelpers = createServerSideHelpers({
+    router: appRouter,
+    ctx: { db, session: null },
+    transformer: SuperJSON,
+  });
 
-  if (isLoading) return <LoadingSpinner />;
+  await serverSideHelpers.post.infinitePosts.prefetchInfinite({
+    limit: POST_BATCH_SIZE,
+  });
 
-  return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-1 md:gap-8">
-      {posts?.map((post) => (
-        <PostView key={post.id} post={post} author={post.author} />
-      ))}
-    </div>
-  );
-}
+  return {
+    props: {
+      trpcState: serverSideHelpers.dehydrate(),
+    },
+  };
+};

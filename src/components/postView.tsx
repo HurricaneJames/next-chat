@@ -3,27 +3,38 @@ import { toast } from "react-hot-toast";
 import { TrashButton } from "~/components/trashButton";
 import { LOGO } from "~/resources/logo";
 import { api } from "~/utils/api";
+import { useInView } from "react-intersection-observer";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 dayjs.extend(relativeTime);
 
-type PostViewProps = {
+export type PostViewProps = {
   post: {
     id: string;
     authorId: string;
     content: string;
     createdAt: Date;
+    author: {
+      // TODO - fix user model so alias and name cannot be null
+      alias: string | null;
+      image: string | null;
+      name: string | null;
+    };
   };
-  author: {
-    alias: string | null;
-    image: string | null;
-    name: string | null;
-  };
+  onObserve?: () => void | null;
 };
 
-export default function PostView({ post, author }: PostViewProps) {
+export default function PostView({ post, onObserve }: PostViewProps) {
+  const { ref: postRef } = useInView({
+    triggerOnce: true,
+    onChange: (inView) => {
+      if (inView && onObserve) {
+        onObserve();
+      }
+    },
+  });
   const ctx = api.useContext();
   const { data: sessionData } = useSession();
   const { mutate, isLoading: isMutating } = api.post.delete.useMutation({
@@ -34,13 +45,15 @@ export default function PostView({ post, author }: PostViewProps) {
       return toast.error("Something went wrong. Please try again later");
     },
   });
-
-  const authorSlug = author.alias ?? post.authorId;
+  const authorSlug = post.author.alias ?? post.authorId;
 
   return (
-    <div className="flex max-w-md flex-row gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20">
+    <div
+      className="flex max-w-md flex-row gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
+      ref={postRef}
+    >
       <img
-        src={author.image ?? ""}
+        src={post.author.image ?? ""}
         alt="Profile image"
         className="h-12 w-12 rounded-full"
       />
@@ -49,7 +62,7 @@ export default function PostView({ post, author }: PostViewProps) {
           <Link
             className="text-fuchsia-500"
             href={`/u/${authorSlug}`}
-          >{`${LOGO}${author.name}`}</Link>
+          >{`${LOGO}${post.author.name}`}</Link>
           <span>{`·`}</span>
           <span className="font-thin">{dayjs(post.createdAt).fromNow()}</span>
         </div>
