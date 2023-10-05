@@ -5,7 +5,7 @@ import { db } from "~/server/db";
 import { api } from "~/utils/api";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import { appRouter } from "~/server/api/root";
-import { GetStaticProps } from "next";
+import type { GetStaticProps } from "next";
 import SuperJSON from "superjson";
 import { LoadingSpinner } from "~/components/loading";
 import CreatePost from "~/components/createPost";

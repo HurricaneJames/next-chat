@@ -23,7 +23,8 @@ export type PostViewProps = {
       name: string | null;
     };
   };
-  onObserve?: () => void | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onObserve?: (() => any) | null;
 };
 
 export default function PostView({ post, onObserve }: PostViewProps) {
@@ -41,7 +42,7 @@ export default function PostView({ post, onObserve }: PostViewProps) {
     onSuccess: () => {
       void ctx.post.invalidate();
     },
-    onError: (error) => {
+    onError: () => {
       return toast.error("Something went wrong. Please try again later");
     },
   });

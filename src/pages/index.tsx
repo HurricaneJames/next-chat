@@ -1,4 +1,4 @@
-import { GetStaticProps } from "next";
+import type { GetStaticProps } from "next";
 import SuperJSON from "superjson";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import CreatePost from "~/components/createPost";
@@ -18,7 +18,7 @@ export default function Home() {
   );
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
+export const getStaticProps: GetStaticProps = async () => {
   const serverSideHelpers = createServerSideHelpers({
     router: appRouter,
     ctx: { db, session: null },

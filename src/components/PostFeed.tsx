@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import type { PostViewProps } from "./postView";
 import PostView from "./postView";
 import { api } from "~/utils/api";
@@ -36,7 +35,8 @@ export default function PostFeed({ authorAlias, batchSize }: Props) {
 
 type FeedPageProps = {
   posts: Post[];
-  shouldLoadMore: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  shouldLoadMore: () => any;
 };
 type Post = {
   id: string;
